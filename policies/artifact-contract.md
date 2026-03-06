@@ -233,3 +233,14 @@ Changes to artifact structure require:
 
 > Collect facts deterministically.
 > Interpret them probabilistically.
+
+## 9. Volatile Fields
+
+The following artifact fields are expected to change between runs and must not be treated as drift by auditors:
+
+- `timestamp_utc`
+- `generated_at_utc`
+- process IDs in `ports.txt`
+- file descriptors in `ports.txt`
+
+Auditors must compare semantic system state rather than byte-for-byte equality when these fields differ.

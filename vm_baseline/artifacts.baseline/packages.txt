@@ -312,7 +312,7 @@ ii  libnl-route-3-200:arm64               3.7.0-0.3build1.1                     
 ii  libnpth0t64:arm64                     1.6-3.1build1                           arm64        replacement for GNU Pth using system threads
 ii  libnspr4:arm64                        2:4.35-1.1build1                        arm64        NetScape Portable Runtime Library
 ii  libnss-systemd:arm64                  255.4-1ubuntu8.12                       arm64        nss module providing dynamic user and group name resolution
-ii  libnss3:arm64                         2:3.98-1build1                          arm64        Network Security Service libraries
+ii  libnss3:arm64                         2:3.98-1ubuntu0.1                       arm64        Network Security Service libraries
 ii  libntfs-3g89t64:arm64                 1:2022.10.3-1.2ubuntu3                  arm64        read/write NTFS driver for FUSE (runtime library)
 ii  libnuma1:arm64                        2.0.18-1ubuntu0.24.04.1                 arm64        Libraries for controlling NUMA policy
 ii  libnvme1t64                           1.8-3ubuntu1                            arm64        NVMe management library (library)
