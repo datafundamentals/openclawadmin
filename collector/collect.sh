@@ -41,7 +41,7 @@ fi
 ########################################
 
 if command -v ss >/dev/null 2>&1; then
-  ss -lntp > "$ARTIFACT_DIR/ports.txt"
+  sudo ss -lntp > "$ARTIFACT_DIR/ports.txt" || true
 else
   netstat -lntp > "$ARTIFACT_DIR/ports.txt" || true
 fi
@@ -78,3 +78,5 @@ EOF
 echo "Artifacts generated at $TIMESTAMP"
 
 sudo ufw status verbose > "$ARTIFACT_DIR/firewall.txt" || true
+
+
