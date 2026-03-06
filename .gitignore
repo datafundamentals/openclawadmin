@@ -1,1 +1,9 @@
 .sync-stamp
+# runtime artifacts from VM
+vm_artifacts/
+
+# temporary report generation outputs
+vm_reports/
+
+# editor files
+.DS_Store
