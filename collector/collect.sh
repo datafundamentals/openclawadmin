@@ -76,3 +76,5 @@ cat > "$ARTIFACT_DIR/metadata.json" <<EOF
 EOF
 
 echo "Artifacts generated at $TIMESTAMP"
+
+sudo ufw status verbose > "$ARTIFACT_DIR/firewall.txt" || true
