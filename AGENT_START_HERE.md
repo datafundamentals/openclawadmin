@@ -7,7 +7,7 @@ Read these files in this exact order before making any changes:
 1. `AGENT_BRIEFING.md`
 2. `ARCHITECTURE.md`
 3. `AGENT_HANDOFF.md`
-4. `tickets/README.md` (if present)
+4. `tickets/README.md`
 5. `tickets/001.md`
 6. `tickets/002.md`
 7. `tickets/003.md`
