@@ -19,8 +19,7 @@ cat > "$ARTIFACT_DIR/config.json" <<EOF
   "plugin_system_enabled": false,
   "ollama_access_enabled": false,
   "elasticsearch_access_mode": "disabled",
-  "approved_llm_providers": ["anthropic", "openai", "gemini"],
-  "timestamp_utc": "$TIMESTAMP"
+  "approved_llm_providers": ["anthropic", "openai", "gemini"]
 }
 EOF
 
@@ -41,9 +40,17 @@ fi
 ########################################
 
 if command -v ss >/dev/null 2>&1; then
-  sudo ss -lntp > "$ARTIFACT_DIR/ports.txt" || true
+  sudo ss -lntp \
+    | sed -E 's/pid=[0-9]+/pid=PID/g' \
+    | sed -E 's/fd=[0-9]+/fd=FD/g' \
+    | sort \
+    > "$ARTIFACT_DIR/ports.txt" || true
 else
-  netstat -lntp > "$ARTIFACT_DIR/ports.txt" || true
+  netstat -lntp \
+    | sed -E 's/pid=[0-9]+/pid=PID/g' \
+    | sed -E 's/fd=[0-9]+/fd=FD/g' \
+    | sort \
+    > "$ARTIFACT_DIR/ports.txt" || true
 fi
 
 ########################################
@@ -56,8 +63,7 @@ cat > "$ARTIFACT_DIR/usage.json" <<EOF
   "openai_calls": 0,
   "gemini_calls": 0,
   "estimated_cost_usd": null,
-  "cap_threshold_warning": false,
-  "timestamp_utc": "$TIMESTAMP"
+  "cap_threshold_warning": false
 }
 EOF
 
