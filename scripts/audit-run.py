@@ -102,6 +102,15 @@ def step2b_validate():
     run([str(SCRIPTS_DIR / "validate-artifacts.sh")])
 
 
+def step2c_drift():
+    print("Step 2c: Checking drift...")
+    result = subprocess.run([str(SCRIPTS_DIR / "check-drift.sh")])
+    if result.returncode == 2:
+        print("Drift check error — aborting.", file=sys.stderr)
+        sys.exit(2)
+    # exit 0 (no drift) or 1 (drift detected) both continue to auditors
+
+
 def step3_auditors() -> dict[str, str]:
     print("Step 3: Running auditors...")
     SECTIONS_DIR.mkdir(parents=True, exist_ok=True)
@@ -197,6 +206,7 @@ def main():
         print("Step 1: Skipping remote collection (--skip-collect)")
     step2_sync()
     step2b_validate()
+    step2c_drift()
     sections = step3_auditors()
     report_path = step4_aggregator(sections)
     step5_summary(report_path)
