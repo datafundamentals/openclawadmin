@@ -347,12 +347,18 @@ Future improvements may include:
 
 # What the Agent Should Do Next
 
-If continuing development, prioritize:
+Tickets 001, 002, and 006 are complete. Continue from ticket 003.
 
-1. Improve artifact contract documentation.
-2. Normalize volatile fields during audit comparison.
-3. Ensure auditors compare **semantic state** rather than raw text.
-4. Harden collector outputs for deterministic comparison.
+The active ticket sequence is:
+
+- ✅ 001 — Volatile field normalization in collector (done)
+- ✅ 002 — Single-command audit pipeline via `scripts/audit-run.py` (done)
+- ✅ 006 — Bash audit script retired (done)
+- **003 — Artifact validation before auditors run**
+- 004 — Drift detection
+- 005 — Report persistence
+
+See `tickets/README.md` for the full list and `tickets/003.md` for the next task.
 
 ---
 

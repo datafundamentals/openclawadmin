@@ -7,3 +7,9 @@ vm_reports/
 
 # editor files
 .DS_Store
+
+# local environment — contains API keys, never commit
+.env
+
+# Python virtual environment
+.venv/

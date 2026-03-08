@@ -13,6 +13,7 @@ Read these files in this exact order before making any changes:
 7. `tickets/003.md`
 8. `tickets/004.md`
 9. `tickets/005.md`
+10. `tickets/006.md`
 
 Rules:
 
