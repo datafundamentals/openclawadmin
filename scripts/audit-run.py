@@ -1,15 +1,25 @@
 #!/usr/bin/env -S /Users/petecarapetyan/work/primary/openclawadmin/.venv/bin/python3
 """
 SecurityCouncil Audit Pipeline
-Runs the full audit: collect → sync → audit → report
+Runs the full audit: collect → sync → validate → drift → audit → report
 
 Usage:
-    python3 audit-run.py               # full automated pipeline (omits ports)
+    python3 audit-run.py               # full automated pipeline
     python3 audit-run.py --skip-collect  # skip remote collection (manual mode)
 
     Manual mode workflow:
         1. ssh pete@<vm> and run ./collector/collect.sh
         2. Run this script with --skip-collect
+
+Each run produces a timestamped directory under vm_reports/:
+    vm_reports/<run_id>/
+        sections/
+            configuration.md
+            dependency.md
+            cost_usage.md
+            exposure.md
+        security-council-report.md
+        run-metadata.json
 
 Dependencies:
     pip install litellm python-dotenv
@@ -18,6 +28,7 @@ Configuration:
     Copy .env.example to .env and set ANTHROPIC_API_KEY and model strings.
 """
 
+import json
 import os
 import subprocess
 import sys
@@ -29,13 +40,12 @@ import litellm
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
-REPO_DIR = Path(__file__).resolve().parent.parent
-SCRIPTS_DIR = REPO_DIR / "scripts"
-PROMPTS_DIR = REPO_DIR / "prompts"
+REPO_DIR     = Path(__file__).resolve().parent.parent
+SCRIPTS_DIR  = REPO_DIR / "scripts"
+PROMPTS_DIR  = REPO_DIR / "prompts"
 ARTIFACTS_DIR = REPO_DIR / "vm_artifacts"
 BASELINE_DIR = REPO_DIR / "vm_baseline" / "artifacts.baseline"
-SECTIONS_DIR = REPO_DIR / "vm_reports" / "sections"
-REPORTS_DIR = REPO_DIR / "vm_reports"
+REPORTS_DIR  = REPO_DIR / "vm_reports"
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
@@ -111,9 +121,10 @@ def step2c_drift():
     # exit 0 (no drift) or 1 (drift detected) both continue to auditors
 
 
-def step3_auditors() -> dict[str, str]:
+def step3_auditors(run_dir: Path) -> dict[str, str]:
     print("Step 3: Running auditors...")
-    SECTIONS_DIR.mkdir(parents=True, exist_ok=True)
+    sections_dir = run_dir / "sections"
+    sections_dir.mkdir(parents=True, exist_ok=True)
 
     auditors = {
         "configuration": {
@@ -153,14 +164,13 @@ def step3_auditors() -> dict[str, str]:
         print(f"  Running {name} auditor...")
         prompt = build_prompt(cfg["prompt"], cfg["files"])
         output = call_llm(MODELS[name], prompt)
-        out_path = SECTIONS_DIR / f"{name}.md"
-        out_path.write_text(output, encoding="utf-8")
+        (sections_dir / f"{name}.md").write_text(output, encoding="utf-8")
         outputs[name] = output
 
     return outputs
 
 
-def step4_aggregator(sections: dict[str, str]) -> Path:
+def step4_aggregator(sections: dict[str, str], run_dir: Path) -> Path:
     print("Step 4: Running report aggregator...")
 
     section_labels = {
@@ -177,18 +187,28 @@ def step4_aggregator(sections: dict[str, str]) -> Path:
     for key, label in section_labels.items():
         parts.append(f"\n=== {label} ===\n{sections[key]}\n")
 
-    parts.append(f"\n=== vm_artifacts/metadata.json ===\n")
+    parts.append("\n=== vm_artifacts/metadata.json ===\n")
     parts.append(read(ARTIFACTS_DIR / "metadata.json"))
 
-    prompt = "".join(parts)
-    report = call_llm(MODELS["aggregator"], prompt)
-
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
-    report_path = REPORTS_DIR / f"security-council-report-{timestamp}.md"
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    report = call_llm(MODELS["aggregator"], "".join(parts))
+    report_path = run_dir / "security-council-report.md"
     report_path.write_text(report, encoding="utf-8")
 
     return report_path
+
+
+def write_run_metadata(run_dir: Path, run_id: str) -> None:
+    artifact_meta = json.loads(read(ARTIFACTS_DIR / "metadata.json"))
+    metadata = {
+        "run_id": run_id,
+        "artifact_timestamp": artifact_meta.get("generated_at_utc", "unknown"),
+        "collector_version": artifact_meta.get("collector_version", "unknown"),
+        "execution_mode": "read-only",
+        "auditors": ["configuration", "dependency", "cost_usage", "exposure"],
+    }
+    (run_dir / "run-metadata.json").write_text(
+        json.dumps(metadata, indent=2), encoding="utf-8"
+    )
 
 
 def step5_summary(report_path: Path) -> None:
@@ -200,15 +220,23 @@ def step5_summary(report_path: Path) -> None:
 def main():
     skip_collect = "--skip-collect" in sys.argv
     os.chdir(REPO_DIR)
+
     if not skip_collect:
         step1_collect()
     else:
         print("Step 1: Skipping remote collection (--skip-collect)")
+
     step2_sync()
     step2b_validate()
     step2c_drift()
-    sections = step3_auditors()
-    report_path = step4_aggregator(sections)
+
+    run_id = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
+    run_dir = REPORTS_DIR / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    write_run_metadata(run_dir, run_id)
+
+    sections = step3_auditors(run_dir)
+    report_path = step4_aggregator(sections, run_dir)
     step5_summary(report_path)
 
 
