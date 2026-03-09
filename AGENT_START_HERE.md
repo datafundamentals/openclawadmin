@@ -2,18 +2,11 @@
 
 PRIORITY RULE: Human is to do all git add, commit and push operations. Never migrate from one ticket or task to the next, without permission from the human, who will commit between tickets/tasks.
 
-Read these files in this exact order before making any changes:
+Read these files in this exact order before making any changes inside this folder:
 
 1. `AGENT_BRIEFING.md`
 2. `ARCHITECTURE.md`
 3. `AGENT_HANDOFF.md`
-4. `tickets/README.md`
-5. `tickets/001.md`
-6. `tickets/002.md`
-7. `tickets/003.md`
-8. `tickets/004.md`
-9. `tickets/005.md`
-10. `tickets/006.md`
 
 Rules:
 
