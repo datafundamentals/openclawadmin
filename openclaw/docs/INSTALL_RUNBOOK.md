@@ -54,7 +54,7 @@ Immediately after install:
 1. Run collector on VM.
 2. Sync artifacts to host.
 3. Run `scripts/validate-artifacts.sh`.
-4. Run full audit (`scripts/audit-run.py --skip-collect` after manual collect).
+4. Run full audit (`./scripts/audit-run.py --skip-collect` after manual collect).
 5. Review report for unexpected exposure or dependency drift.
 
 If install is intentional and clean, perform baseline promotion only with explicit human approval.

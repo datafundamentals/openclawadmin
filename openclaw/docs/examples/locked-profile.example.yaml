@@ -1,0 +1,27 @@
+# OpenClaw locked profile example for OC-001
+# Adjust key names to match your OpenClaw runtime.
+
+runtime:
+  mode: manual
+  autonomous_loop_enabled: false
+
+tools:
+  browser_enabled: false
+  shell_enabled: false
+  plugins_enabled: false
+
+filesystem:
+  host_mounts_enabled: false
+  allowed_paths:
+    - /home/pete/openclaw-runtime
+
+network:
+  outbound_integrations_enabled: false
+  allowed_providers:
+    - openai
+
+credentials:
+  use_dedicated_capped_keys: true
+
+telemetry:
+  verbose_tool_logs: true

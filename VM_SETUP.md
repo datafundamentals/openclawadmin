@@ -55,7 +55,7 @@ This is expected and intentional.
 ### Part B: Run the analysis on the host
 
 ```bash
-python3 scripts/audit-run.py --skip-collect
+./scripts/audit-run.py --skip-collect
 ```
 
 This syncs the artifacts, runs the four auditors, runs the aggregator,
@@ -104,5 +104,5 @@ documented in the git history before enabling.
 When enabled, the full pipeline runs unattended as:
 
 ```bash
-python3 scripts/audit-run.py
+./scripts/audit-run.py
 ```
